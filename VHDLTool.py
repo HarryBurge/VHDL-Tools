@@ -21,12 +21,9 @@ import os
 import lib.compiler as compiler
 
 
-# Globals
-args = sys.argv
-
-
 # Main
-def main():
+def main(path,args):
+    
     # Args interpretation
     if args[1] in ('-C','-c','C','c'): #Compile option
 
@@ -35,8 +32,8 @@ def main():
             # Check VHDL file exists
             if os.path.isfile(args[2]):
                 # Run compiler with config
-                if len(args)==3: compiler.compile(file_to_be_compiled=args[2])
-                if len(args)==4: compiler.compile(file_to_be_compiled=args[2], output_compiled_file=args[3])
+                if len(args)==3: compiler.compile(path=path,file_to_be_compiled=args[2])
+                if len(args)==4: compiler.compile(path=path,file_to_be_compiled=args[2], output_compiled_file=args[3])
             # VHDL file doesn't exist - Error
             else:
                 raise FileNotFoundError(f'''
@@ -73,8 +70,3 @@ def main():
         -w <File_Compiled> (*.py) <File_Inputs> (*.txt)
         -d <File_Compiled> (*.py) [<File_Inputs> (*.txt) | ]
         ''')
-
-
-
-if __name__ == '__main__':
-    main()

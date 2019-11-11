@@ -10,8 +10,8 @@ __date__      = "$Date: 2019-11-11 09:52:00 $"
 #----------------------------- actual code --------------------------------
 
 # Imports
+import sys
 import os
 
-def compile(file_to_be_compiled, output_compiled_file='compiledVHDL.py'):
-    print(output_compiled_file)
-    return True
+def compile(path, file_to_be_compiled, output_compiled_file='compiledVHDL.py'):
+    print(path)

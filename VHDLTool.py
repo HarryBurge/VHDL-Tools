@@ -20,6 +20,7 @@ import sys
 import os
 import lib.compiler as compiler
 
+
 # Globals
 args = sys.argv
 
@@ -50,14 +51,17 @@ def main():
 
 
     elif args[1] in ('-W','-w','W','w'): # Waveform read option
+        # TODO: Create a waveform function
         print("1")
 
 
     elif args[1] in ('-D','-d','D','d'): # Simulate option
+        # TODO: Create a debugger
         print("1")
 
 
     elif args[1] in ('--Help','--help','-Help','-help','Help','help','-hlp','hlp'):
+        # TODO: Create help info
         print("help string")
 
 

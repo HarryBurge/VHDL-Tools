@@ -2,14 +2,13 @@
 -- They have to be either a single line by themselves or at the end of a line
 
 # This is a comment
-' This is a comment
 // This is a comment
 -- This is a comment
 
 
 -- This will be the default structure for an entity
 
-entity Test_Adder_VHDL is
+entity Test_Adder_VHDL is -- this is a side comment check
     port
     (
 	I1 : in std_logic;
@@ -33,3 +32,5 @@ end architecture;
 
 -- statements have to be ended with a ;
 -- formatting doesn't matter so \n or \t doesn't count
+
+-- this is -- a double comment check

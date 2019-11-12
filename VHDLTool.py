@@ -21,9 +21,8 @@ import os
 import lib.compiler as compiler
 
 
-# Main
 def main(path,args):
-    
+
     # Args interpretation
     if args[1] in ('-C','-c','C','c'): #Compile option
 

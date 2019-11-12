@@ -1,0 +1,35 @@
+-- Comments can be signified with any of these symbols
+-- They have to be either a single line by themselves or at the end of a line
+
+# This is a comment
+' This is a comment
+// This is a comment
+-- This is a comment
+
+
+-- This will be the default structure for an entity
+
+entity Test_Adder_VHDL is
+    port
+    (
+	I1 : in std_logic;
+	I2 : in std_logic;
+	O1 : out std_logic;
+	COut : out std_logic;
+    );
+end entity;
+
+architecture of Test_Adder_VHDL is
+    begin
+    (
+	O1 <= I1 XOR I2;
+	COut <= I1 AND I2;
+    );
+end architecture;
+
+-- entity can also be ent
+-- architecture can also be arch
+-- They can all be capatalised or not
+
+-- statements have to be ended with a ;
+-- formatting doesn't matter so \n or \t doesn't count

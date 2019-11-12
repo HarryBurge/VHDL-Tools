@@ -14,4 +14,15 @@ import sys
 import os
 
 def compile(path, file_to_be_compiled, output_compiled_file='compiledVHDL.py'):
-    print(path)
+
+    file = open(path + '\\' + file_to_be_compiled, 'r')
+    VHDLText = file.read()
+    file.close()
+
+    VHDLText = VHDLText.replace('    ','') .replace('\t','').split('\n')
+
+    VHDLText = removeComments(VHDLText, ['--','#','//',"'"])
+
+    print(VHDLText)
+
+def removeComments(array_of_lines, comment_identifiers)

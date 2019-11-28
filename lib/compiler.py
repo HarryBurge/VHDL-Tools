@@ -39,10 +39,9 @@ def compile(path, file_to_be_compiled, output_compiled_file='compiledVHDL.py'):
     # Remove comments
     VHDLText = removeComments(array_of_lines=VHDLText,comment_identifiers=['--','#','//'])
 
-    # TODO: Complete compilation
     # Put all entitys into a pool and have them then be compiled into python then sent back to possible a index
 
-    # Flatten VHDLText
+    # Flatten VHDLText # TODO: Make multiprocessed
     temp = ''
     for line in VHDLText:
         temp += line
@@ -51,39 +50,74 @@ def compile(path, file_to_be_compiled, output_compiled_file='compiledVHDL.py'):
     # Splits up all sections
     VHDLText = re.split('end entity;|end architecture;', VHDLText)
 
-    # Splits up architectures from entitys
+    # Splits up architectures from entitys # TODO: Make multiprocessed
     entitys = []
     architectures = []
 
     for line in VHDLText:
         if line.find('entity') == False:
+
+            # Do manipulations for usable format
             line = line.replace('entity ', '')
-            line = line.replace(' isport(', ';')
-            line = line.replace(');', '')
+            line = line.replace(' isport{', ';')
+            line = line.replace('};', '')
             line = line.split(';')
+
             del line[-1]
             entitys.append(line)
+
         elif line.find('architecture') == False:
+
+            # Do manipulations for usable format
             line = line.replace('architecture of ', '')
-            line = line.replace(' isbegin(', ';')
-            line = line.replace(');', '')
+            line = line.replace(' isbegin{', ';')
+            line = line.replace('};', '')
             line = line.split(';')
+
             del line[-1]
             architectures.append(line)
 
-    # Combines entity with architecture to chip
+    # Combines entity with architecture to chip # TODO: Make multiprocessed
     chips = []
 
     for i in entitys:
-        try:
-            chips.append([i, architectures[architectures.index(i[0])]])
-        except ValueError:
-            print('''
-            ching chong
-            ''')
-            ## Continue here douchebag
+        for j in architectures:
+            if i[0] == j[0]:
+                temp = {}
 
-    print(chips)
+                params = []
+                returns = []
+                for k in i[1:]:
+                    if k.split(':')[1].lstrip().split(' ')[0] == 'in':
+                        params.append(k.split(':')[0].strip() + ':' + k.split(':')[1].lstrip().split(' ')[1])
+                    elif k.split(':')[1].lstrip().split(' ')[0] == 'out':
+                        returns.append(k.split(':')[0].strip() + ':' + k.split(':')[1].lstrip().split(' ')[1])
+
+                logic = []
+                for k in j[1:]:
+                    logic.append(k)
+
+                temp['name'] = i[0]
+                temp['params'] = params
+                temp['returns'] = returns
+                temp['logic'] = logic
+
+                chips.append(temp)
+                break
+
+    # Puts pre compiled content in for ease of use for users
+    # file = open(os.path.dirname(os.path.abspath(__file__)) + '\\PreBuilt.py', 'r')
+    # code = file.read() + '\n\n'
+    # file.close()
+
+    code = ''
+    # Processes all the items # TODO: Make multiprocessed
+    for i in chips:
+        code += codeGeneration(i) + '\n\n'
+
+    #print(code)
+
+
 
 
 def removeComments(array_of_lines, comment_identifiers):
@@ -117,3 +151,77 @@ def removeComments(array_of_lines, comment_identifiers):
         ''')
 
     return temp
+
+# TODO: Need to create the thing where you store the object of diffrent things
+def codeGeneration(chip):
+    """
+    Takes and converts a chip into python code
+
+    :param dict chip: Holds info for chip to be created {name, params, returns, logic}
+
+    :returns string: Pyhton code of chip
+    """
+
+    # Header of the class
+    code = 'class ' + chip.get('name') + '():\n\n'
+
+
+    # Initalize output variables
+    for i in chip.get('returns'):
+        if i.split(':')[1] == 'std_logic':
+            code += '\t' + i.split(':')[0] + ' = False\n'
+
+
+    for i in chip.get('logic'):
+        i = i.split('<=')
+        i[0] = i[0].rstrip()
+        i[1] = i[1].lstrip()
+
+        i[1] = toTokenCode(i[1])
+        if type(i[1]) == str:
+            i[1] = [i[1]]
+
+        print(i[1])
+        ##Pick up from here, you need to make it so the array that comes back
+        ##All the chips are created like in example PreBuilt.py -> XORs = {}
+        ##Then below at somepoint actually create the logic noob
+
+
+    code += '\n'
+
+
+    # Init function
+    code += '\tdef __init__(self'
+    for i in chip.get('params'):
+        if i.split(':')[1] == 'std_logic':
+            code += ', ' + i.split(':')[0]
+    code += '):\n'
+
+    for i in chip.get('params'):
+        if i.split(':')[1] == 'std_logic':
+            code += '\t\tself.' + i.split(':')[0] + ' = ' + i.split(':')[0] + '\n'
+    code += '\n'
+
+
+    # Get for outputs
+    code += '\t def getOutputs(self):\n'
+    code += '\t\treturn {'
+    for i in chip.get('returns'):
+        if i.split(':')[1] == 'std_logic':
+            code += '\'' + i.split(':')[0] + '\':self.' + i.split(':')[0] + ', '
+    code = code[:-2] + '}\n'
+
+    return code
+
+def toTokenCode(logic_line):
+
+    if logic_line.find('(') != -1:
+        Command = logic_line[:logic_line.find('(')]
+
+        logic_line = logic_line[logic_line.find('(')+1:-1]
+
+        leftSide = logic_line[:logic_line.rfind(',')]
+        rightSide = logic_line[logic_line.rfind(','):]
+
+        return [Command, toTokenCode(leftSide), toTokenCode(rightSide)]
+    return logic_line

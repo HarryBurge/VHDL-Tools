@@ -10,20 +10,38 @@
 
 entity Test_Adder_VHDL is -- this is a side comment check
     port
-    (
+    {
 	I1 : in std_logic;
 	I2 : in std_logic;
 	O1 : out std_logic;
 	COut : out std_logic;
-    );
+    };
 end entity;
 
 architecture of Test_Adder_VHDL is
     begin
-    (
-	O1 <= I1 XOR I2;
-	COut <= I1 AND I2;
-    );
+    {
+	O1 <= AND(XOR(I1, I2), I3);
+	COut <= AND(I1, I2);
+    };
+end architecture;
+
+entity Test_Bus_VHDL is -- this is a side comment check
+    port
+    {
+	I1 : in std_logic;
+	I2 : in std_logic;
+	O1 : out std_logic;
+	O2 : out std_logic;
+    };
+end entity;
+
+architecture of Test_Bus_VHDL is
+    begin
+    {
+	O1 <= I1;
+	O2 <= I2;
+    };
 end architecture;
 
 -- entity can also be ent

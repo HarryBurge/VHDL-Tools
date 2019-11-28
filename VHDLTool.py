@@ -40,7 +40,7 @@ def main(path,args):
                 ''')
         # To many or to little arguments - Error
         else:
-            raise ValueError(f'''
+            raise ArgumentError(f'''
             There are {len(args) - 2} args.
             Format should be "-c <File_To_Be_Compiled> (*.txt) [<Output_Compiled_File> (*.py) | compiledVHDL.py]"
             ''')
@@ -68,4 +68,5 @@ def main(path,args):
         -c <File_To_Be_Compiled> (*.txt) [<Output_Compiled_File> (*.py) | compiledVHDL.py]
         -w <File_Compiled> (*.py) <File_Inputs> (*.txt)
         -d <File_Compiled> (*.py) [<File_Inputs> (*.txt) | ]
+        - help
         ''')

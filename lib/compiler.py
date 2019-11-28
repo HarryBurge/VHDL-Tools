@@ -13,6 +13,8 @@ __date__      = "$Date: 2019-11-11 09:52:00 $"
 # Imports
 import sys
 import os
+import re
+import multiprocessing
 
 
 def compile(path, file_to_be_compiled, output_compiled_file='compiledVHDL.py'):
@@ -37,7 +39,51 @@ def compile(path, file_to_be_compiled, output_compiled_file='compiledVHDL.py'):
     # Remove comments
     VHDLText = removeComments(array_of_lines=VHDLText,comment_identifiers=['--','#','//'])
 
-    print(VHDLText)
+    # TODO: Complete compilation
+    # Put all entitys into a pool and have them then be compiled into python then sent back to possible a index
+
+    # Flatten VHDLText
+    temp = ''
+    for line in VHDLText:
+        temp += line
+    VHDLText = temp
+
+    # Splits up all sections
+    VHDLText = re.split('end entity;|end architecture;', VHDLText)
+
+    # Splits up architectures from entitys
+    entitys = []
+    architectures = []
+
+    for line in VHDLText:
+        if line.find('entity') == False:
+            line = line.replace('entity ', '')
+            line = line.replace(' isport(', ';')
+            line = line.replace(');', '')
+            line = line.split(';')
+            del line[-1]
+            entitys.append(line)
+        elif line.find('architecture') == False:
+            line = line.replace('architecture of ', '')
+            line = line.replace(' isbegin(', ';')
+            line = line.replace(');', '')
+            line = line.split(';')
+            del line[-1]
+            architectures.append(line)
+
+    # Combines entity with architecture to chip
+    chips = []
+
+    for i in entitys:
+        try:
+            chips.append([i, architectures[architectures.index(i[0])]])
+        except ValueError:
+            print('''
+            ching chong
+            ''')
+            ## Continue here douchebag
+
+    print(chips)
 
 
 def removeComments(array_of_lines, comment_identifiers):
@@ -60,6 +106,14 @@ def removeComments(array_of_lines, comment_identifiers):
                 # Remove it and everything after it
                 line = line[:line.find(symbol)]
 
-        temp.append(line)
+        # Removes blank lines
+        if line != '':
+            temp.append(line.rstrip().lstrip())
+
+    # Empty check
+    if temp == []:
+        raise EmptyFileError(f'''
+        The file to be compiled has only comments in it, or is blank
+        ''')
 
     return temp
